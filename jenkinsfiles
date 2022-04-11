@@ -35,16 +35,31 @@ pipeline {
             }
        }
        stage('Get ansible code') {
+         when {
+                expression {choice == '1'}
+            }
           steps{
              
                 git "https://github.com/rayank07/tomcat-jenkins.git"
           }
        }
         stage('execute ansible') {
+          when {
+                expression {choice == '2'}
+            }
           steps{
              
                 sshagent(['ansible-ssh']) {
                  ansiblePlaybook inventory:  'dev.inv',disableHostKeyChecking: true,  playbook: 'tomcat.yml'
+              }
+
+          }
+       }
+       stage('deploy jar in tomcat') {
+            
+          steps{
+            sshagent(['ssh-pass-ansible']) {
+              sh "scp -r -o StrictHostKeyChecking=no target/chatapp.jar root@tomcat:/opt/tomcat"
               }
 
           }
