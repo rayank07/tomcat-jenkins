@@ -34,36 +34,6 @@ pipeline {
                     archiveArtifacts 'target/*.jar'
                 }
             }
-       }
-       stage('Get ansible code') {
-         when {
-                expression {choice == '1'}
-            }
-          steps{
-             
-                git "https://github.com/rayank07/tomcat-jenkins.git"
-          }
-       }
-        stage('execute ansible') {
-          when {
-                expression {choice == '2'}
-            }
-          steps{
-             
-                sshagent(['ansible-ssh']) {
-                 ansiblePlaybook inventory:  'dev.inv',disableHostKeyChecking: true,  playbook: 'tomcat.yml'
-              }
-
-          }
-       }
-       stage('deploy jar in tomcat') {
-            
-          steps{
-            sshagent(['ansible-ssh']) {
-              sh "scp -r -o StrictHostKeyChecking=no target/chatapp.jar root@tomcat:/usr/local/apache-tomcat-10.0.8/webapps"
-              }
-
-          }
-       }
     }
+}
 }
